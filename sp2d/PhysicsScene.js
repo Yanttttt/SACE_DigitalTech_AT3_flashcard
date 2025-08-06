@@ -4,7 +4,7 @@ import * as Collision from "./Collision.js";
 import * as Joint from "./Joint.js";
 import { Vector2, VectorMath2 } from "./Vector2.js";
 
-var MAX_ENTITY=1e4;
+var MAX_ENTITY = 1e4;
 
 export var simWidth;
 export var simHeight;
@@ -29,7 +29,7 @@ var disableColl = [];
 
 export var substep;
 
-export function init(worldSize_ = null, gravity_ = new Vector2(0.0, -9.8), airResistance_=0.0) {
+export function init(worldSize_ = null, gravity_ = new Vector2(0.0, -9.8), airResistance_ = 0.0) {
     simWidth = Draw.canvas.width / Draw.scale;
     simHeight = Draw.canvas.height / Draw.scale;
 
@@ -112,12 +112,11 @@ export function setDt(d) {
     dt = d;
 }
 
-export function disableCollision(a,b)
-{
-    if(!a||!b)
+export function disableCollision(a, b) {
+    if (!a || !b)
         return;
-    disableColl[a][b]=true;
-    disableColl[b][a]=true;
+    disableColl[a][b] = true;
+    disableColl[b][a] = true;
 }
 
 export function setFloorCollision(restitution = 0, friction = 0) {
@@ -206,7 +205,7 @@ export function setWallCollision(restitution = 0, friction = 0) {
     addEntity(right);
 }
 
-export function setThickWallCollision(restitution = 0,friction = 0) {
+export function setThickWallCollision(restitution = 0, friction = 0) {
     var thickness = 0.5;
     var top = new Entity.Rectangle(
         simWidth,
@@ -274,7 +273,7 @@ export function setThickWallCollision(restitution = 0,friction = 0) {
 }
 
 export function simulate(substep_ = 1) {
-    substep=substep_;
+    substep = substep_;
     if (paused) return;
 
     collisions = [];
@@ -288,14 +287,9 @@ export function simulate(substep_ = 1) {
             entities[i].simulate(dt / substep, gravity);
         }
 
-        for (let joint of joints)
-        {
-            joint.apply();
-        }
-
         for (let i = 0; i < entities.length; i++) {
             for (let j = i + 1; j < entities.length; j++) {
-                if(disableColl[i][j]||disableColl[j][i]) continue;
+                if (disableColl[i][j] || disableColl[j][i]) continue;
                 var collision = Collision.detect(entities[i], entities[j]);
                 if (collision != null) {
                     //console.log(collision);
@@ -307,6 +301,10 @@ export function simulate(substep_ = 1) {
 
         for (let i = 0; i < collisions.length; i++) {
             collisions[i].resolve();
+        }
+
+        for (let joint of joints) {
+            joint.apply();
         }
     }
 }
@@ -349,9 +347,9 @@ export function drawContactPoint() {
 
 export function drawAnchorPoint() {
     for (let j of joints) {
-        
-        var rotatedAnchorA = j.anchorA.rotate(-j.angleA+j.bodyA.angle);
-        var rotatedAnchorB = j.anchorB.rotate(-j.angleB+j.bodyB.angle);
+
+        var rotatedAnchorA = j.anchorA.rotate(-j.angleA + j.bodyA.angle);
+        var rotatedAnchorB = j.anchorB.rotate(-j.angleB + j.bodyB.angle);
 
         var Pa = j.bodyA.pos.add(rotatedAnchorA);
         //Absolute coordinates of unconstrained entity

@@ -112,9 +112,8 @@ export class Distance extends Joint {
         var diff = Pa.subtract(Pb);
         var currentLength = diff.length();
         var normal = diff.normalise();
-        var depth = (currentLength - this.length)*2;
-
-        var e = Math.min(a.restitution,b.restitution);
+        var depth = (currentLength - this.length) * 2;
+        
         var r_ap = Pa.subtract(a.pos);
         var r_bp = Pb.subtract(b.pos);
         var v_a = a.vel.add(r_ap.perpendicular(), a.angularVel);
