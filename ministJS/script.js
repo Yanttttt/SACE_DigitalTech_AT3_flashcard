@@ -29,13 +29,10 @@ function setupCanvas() {
     canvas.onmouseleave = () => drawing = false;
     canvas.onmousemove = e => {
         if (!drawing) return;
-        ctx.fillStyle = 'black';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 20;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
+        ctx.arc(e.offsetX, e.offsetY, 15, 0, Math.PI * 2);
+        ctx.fillStyle = 'black';
+        ctx.fill();
     };
 }
 
@@ -44,6 +41,7 @@ function clear() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 window.clear = clear;
+
 
 /**
  * @param {{ width: number; height: any; }} canvas
@@ -69,6 +67,33 @@ function getInput(canvas) {
             input[y * 28 + x] = (255 - avg) / 255;
         }
     }
+
+
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = 28;
+    outCanvas.height = 28;
+    const outCtx = outCanvas.getContext('2d');
+
+    const imageData = outCtx.createImageData(28, 28);
+    for (let i = 0; i < input.length; i++) {
+        const color = input[i] * 255; // 0 ~ 255
+        imageData.data[i * 4 + 0] = color; // R
+        imageData.data[i * 4 + 1] = color; // G
+        imageData.data[i * 4 + 2] = color; // B
+        imageData.data[i * 4 + 3] = 255;   // Alpha
+    }
+
+    outCtx.putImageData(imageData, 0, 0);
+
+    const bigCanvas = document.createElement('canvas');
+    bigCanvas.width = 280;
+    bigCanvas.height = 280;
+    const bigCtx = bigCanvas.getContext('2d');
+    bigCtx.imageSmoothingEnabled = false;
+    bigCtx.drawImage(outCanvas, 0, 0, 280, 280);
+    document.body.appendChild(bigCanvas);
+
     return { shape: [28, 28, 1], values: input };
 }
 

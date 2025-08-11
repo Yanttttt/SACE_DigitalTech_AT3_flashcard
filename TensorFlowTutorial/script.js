@@ -120,8 +120,8 @@ async function train(model, data) {
     };
     const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
-    const BATCH_SIZE = 128;
-    const TRAIN_DATA_SIZE = 550;
+    const BATCH_SIZE = 256;
+    const TRAIN_DATA_SIZE = 1100;
     const TEST_DATA_SIZE = 100;
 
     const [trainXs, trainYs] = tf.tidy(() => {
@@ -189,28 +189,24 @@ async function saveWeights(model) {
     const weightsData = [];
 
     for (const w of weights) {
-        const vals = await w.data(); // 异步拿权重数据
+        const vals = await w.data();
         weightsData.push({
             name: w.name,
             shape: w.shape,
-            data: Array.from(vals) // 转成数组方便 JSON 序列化
+            data: Array.from(vals)
         });
     }
 
     const jsonStr = JSON.stringify(weightsData, null, 2);
 
-    // 创建 Blob 对象
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-
-    // 创建临时 a 标签，触发下载
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'weights-only.json'; // 文件名
+    a.download = 'weights.json';
     document.body.appendChild(a);
     a.click();
 
-    // 释放资源，清理标签
     a.remove();
     URL.revokeObjectURL(url);
 }
