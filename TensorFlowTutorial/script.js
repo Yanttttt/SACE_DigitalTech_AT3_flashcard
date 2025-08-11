@@ -45,6 +45,7 @@ async function run() {
     await train(model, data);
 
     await model.save('downloads://mnist-model');
+    await saveWeights(model);
 
     await showAccuracy(model, data);
     await showConfusion(model, data);
@@ -119,9 +120,9 @@ async function train(model, data) {
     };
     const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
-    const BATCH_SIZE = 128;
-    const TRAIN_DATA_SIZE = 550;
-    const TEST_DATA_SIZE = 100;
+    const BATCH_SIZE = 8;
+    const TRAIN_DATA_SIZE = 5;
+    const TEST_DATA_SIZE = 1;
 
     const [trainXs, trainYs] = tf.tidy(() => {
         const d = data.nextTrainBatch(TRAIN_DATA_SIZE);
@@ -183,3 +184,33 @@ async function showConfusion(model, data) {
     labels.dispose();
 }
 
+async function saveWeights(model) {
+    const weights = model.getWeights();
+    const weightsData = [];
+
+    for (const w of weights) {
+        const vals = await w.data(); // 异步拿权重数据
+        weightsData.push({
+            name: w.name,
+            shape: w.shape,
+            data: Array.from(vals) // 转成数组方便 JSON 序列化
+        });
+    }
+
+    const jsonStr = JSON.stringify(weightsData, null, 2);
+
+    // 创建 Blob 对象
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // 创建临时 a 标签，触发下载
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'weights-only.json'; // 文件名
+    document.body.appendChild(a);
+    a.click();
+
+    // 释放资源，清理标签
+    a.remove();
+    URL.revokeObjectURL(url);
+}
