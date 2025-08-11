@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
   <title>MNIST</title>
-  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <h2>Write a number</h2>
-  <canvas id="canvas" width="280" height="280"></canvas>
+  <canvas id="canvas" style="border:2px solid" width="280" height="280"></canvas>
   <div>
-    <button onclick="clearCanvas()">Clear</button>
-    <button onclick="runPrediction()">Scan</button>
+    <button onclick="clear()">Clear</button>
+    <button onclick="predict()">Scan</button>
   </div>
   <h3 id="result">Result:-</h3>
 
-  <script src="utils.js"></script>
-  <script src="mnist.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>
