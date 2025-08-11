@@ -1,6 +1,3 @@
-tf.setBackend('cpu').then(() => {
-    console.log('Using CPU backend');
-});
 console.log('Hello TensorFlow');
 
 import { MnistData } from './data.js';
@@ -120,9 +117,9 @@ async function train(model, data) {
     };
     const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
-    const BATCH_SIZE = 256;
-    const TRAIN_DATA_SIZE = 1100;
-    const TEST_DATA_SIZE = 100;
+    const BATCH_SIZE = 512;
+    const TRAIN_DATA_SIZE = 55000;
+    const TEST_DATA_SIZE = 10000;
 
     const [trainXs, trainYs] = tf.tidy(() => {
         const d = data.nextTrainBatch(TRAIN_DATA_SIZE);
@@ -145,7 +142,7 @@ async function train(model, data) {
     return model.fit(trainXs, trainYs, {
         batchSize: BATCH_SIZE,
         validationData: [testXs, testYs],
-        epochs: 10,
+        epochs: 20,
         shuffle: true,
         callbacks: fitCallbacks
     });
