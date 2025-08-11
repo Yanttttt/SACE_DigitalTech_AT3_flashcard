@@ -28,16 +28,16 @@ export class Joint {
 
         this.colour = colour;
 
-        this.angleA=bodyA.angle;
-        this.angleB=bodyB.angle;
+        this.angleA = bodyA.angle;
+        this.angleB = bodyB.angle;
     }
 
-    apply() {}
+    apply() { }
 
-    draw() {}
+    draw() { }
 }
 
-export class Weld extends Joint{
+export class Weld extends Joint {
     //base class. fixed joint
     /**
      * @param {Vector2} anchorA
@@ -49,7 +49,7 @@ export class Weld extends Joint{
      */
     constructor(bodyA, bodyB, anchorA, anchorB, visibility, colour = "#000000") {
         super(bodyA, bodyB, anchorA, anchorB, visibility, colour);
-        
+
         this.id = null;
         this.length = anchorA.add(bodyA.pos).subtract(anchorB.add(bodyB.pos)).length();
 
@@ -58,8 +58,8 @@ export class Weld extends Joint{
 
         this.colour = colour;
 
-        this.angleA=bodyA.angle;
-        this.angleB=bodyB.angle;
+        this.angleA = bodyA.angle;
+        this.angleB = bodyB.angle;
     }
 
     apply() {
@@ -67,13 +67,13 @@ export class Weld extends Joint{
     }
 
     draw() {
-        var rotatedAnchorA = this.anchorA.rotate(-this.angleA+this.bodyA.angle);
-        var rotatedAnchorB = this.anchorB.rotate(-this.angleB+this.bodyB.angle);
+        var rotatedAnchorA = this.anchorA.rotate(-this.angleA + this.bodyA.angle);
+        var rotatedAnchorB = this.anchorB.rotate(-this.angleB + this.bodyB.angle);
 
         var Pa = this.bodyA.pos.add(rotatedAnchorA);
         var Pb = this.bodyB.pos.add(rotatedAnchorB);
-        if(this.visibility)
-            Draw.drawSpring(Pa, Pb, 1, 0, this.colour); 
+        if (this.visibility)
+            Draw.drawSpring(Pa, Pb, 1, 0, this.colour);
     }
 }
 
@@ -90,20 +90,19 @@ export class Distance extends Joint {
         // this.length = anchorA.subtract(anchorB).length();
         this.id = null;
         this.length = anchorA.add(bodyA.pos).subtract(anchorB.add(bodyB.pos)).length();
-        this.angleA=bodyA.angle;//record the initial angle offset
-        this.angleB=bodyB.angle;
+        this.angleA = bodyA.angle;//record the initial angle offset
+        this.angleB = bodyB.angle;
     }
 
     apply() {
         // a joint is actually a collision
-        var corrFactor = 0.8;
-        // / PhysicsScene.substep;
+        var corrFactor = 0.3 / PhysicsScene.substep;
 
         var a = this.bodyA;
         var b = this.bodyB;
 
-        var rotatedAnchorA = this.anchorA.rotate(-this.angleA+this.bodyA.angle);
-        var rotatedAnchorB = this.anchorB.rotate(-this.angleB+this.bodyB.angle);
+        var rotatedAnchorA = this.anchorA.rotate(-this.angleA + this.bodyA.angle);
+        var rotatedAnchorB = this.anchorB.rotate(-this.angleB + this.bodyB.angle);
 
         var Pa = this.bodyA.pos.add(rotatedAnchorA);
         //Absolute coordinates of unconstrained entity
@@ -113,7 +112,7 @@ export class Distance extends Joint {
         var currentLength = diff.length();
         var normal = diff.normalise();
         var depth = (currentLength - this.length) * 2;
-        
+
         var r_ap = Pa.subtract(a.pos);
         var r_bp = Pb.subtract(b.pos);
         var v_a = a.vel.add(r_ap.perpendicular(), a.angularVel);
@@ -165,13 +164,13 @@ export class Distance extends Joint {
     }
 
     draw() {
-        var rotatedAnchorA = this.anchorA.rotate(-this.angleA+this.bodyA.angle);
-        var rotatedAnchorB = this.anchorB.rotate(-this.angleB+this.bodyB.angle);
+        var rotatedAnchorA = this.anchorA.rotate(-this.angleA + this.bodyA.angle);
+        var rotatedAnchorB = this.anchorB.rotate(-this.angleB + this.bodyB.angle);
 
         var Pa = this.bodyA.pos.add(rotatedAnchorA);
         //Absolute coordinates of unconstrained entity
         var Pb = this.bodyB.pos.add(rotatedAnchorB);
-        if(this.visibility)
+        if (this.visibility)
             Draw.drawSpring(Pa, Pb, 1, 0, this.colour); //straight line
     }
 }
@@ -190,23 +189,23 @@ export class Spring extends Joint {
     constructor(bodyA, bodyB, anchorA, anchorB, width, stiffness, damping, visibility = false, colour = "#000000") {
         super(bodyA, bodyB, anchorA, anchorB, visibility, colour);
         this.id = null;
-        this.width=width;
+        this.width = width;
         this.stiffness = stiffness; //aka spring constant. Newton / meter
         this.damping = damping; //you know what it is
         this.restLength = anchorA.add(bodyA.pos).subtract(anchorB.add(bodyB.pos)).length();
         //initial length
-        
-        this.angleA=bodyA.angle;
-        this.angleB=bodyB.angle;
+
+        this.angleA = bodyA.angle;
+        this.angleB = bodyB.angle;
     }
 
     apply() {
-        var dt=PhysicsScene.dt/PhysicsScene.substep;
+        var dt = PhysicsScene.dt / PhysicsScene.substep;
         var a = this.bodyA;
         var b = this.bodyB;
-        
-        var rotatedAnchorA = this.anchorA.rotate(-this.angleA+this.bodyA.angle);
-        var rotatedAnchorB = this.anchorB.rotate(-this.angleB+this.bodyB.angle);
+
+        var rotatedAnchorA = this.anchorA.rotate(-this.angleA + this.bodyA.angle);
+        var rotatedAnchorB = this.anchorB.rotate(-this.angleB + this.bodyB.angle);
 
         var Pa = this.bodyA.pos.add(rotatedAnchorA);
         //Absolute coordinates of unconstrained entity
@@ -221,7 +220,7 @@ export class Spring extends Joint {
         var stretch = currentLength - this.restLength;
 
         // Hooke's law
-        var springForce = normal.times(-this.stiffness * stretch*dt);
+        var springForce = normal.times(-this.stiffness * stretch * dt);
         // integrating force * dt gives an impulse
         // So here the value 1/dt is the number of terms of the Riemann sum
         // So increase the substep can significantly increase the accuracy
@@ -230,7 +229,7 @@ export class Spring extends Joint {
         var r_bp = Pb.subtract(b.pos);
 
         var v_a = a.vel.add(r_ap.perpendicular().times(a.angularVel));
-        var v_b = b.vel.add(r_bp.perpendicular().times(b.angularVel)); 
+        var v_b = b.vel.add(r_bp.perpendicular().times(b.angularVel));
 
         var v_rel = v_b.subtract(v_a);
         var dampingForce = normal.times(-this.damping * dt * v_rel.dot(normal));
@@ -248,13 +247,13 @@ export class Spring extends Joint {
     }
 
     draw() {
-        var rotatedAnchorA = this.anchorA.rotate(-this.angleA+this.bodyA.angle);
-        var rotatedAnchorB = this.anchorB.rotate(-this.angleB+this.bodyB.angle);
+        var rotatedAnchorA = this.anchorA.rotate(-this.angleA + this.bodyA.angle);
+        var rotatedAnchorB = this.anchorB.rotate(-this.angleB + this.bodyB.angle);
 
         var Pa = this.bodyA.pos.add(rotatedAnchorA);
         //Absolute coordinates of unconstrained entity
         var Pb = this.bodyB.pos.add(rotatedAnchorB);
-        if(this.visibility)
+        if (this.visibility)
             Draw.drawSpring(Pa, Pb, 10, this.width, this.colour); //straight line
     }
 }

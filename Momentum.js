@@ -17,7 +17,7 @@ function addPendulum(pos) {
     hinge.setStatic();
     PhysicsScene.addEntity(hinge);
 
-    var ball = new Entity.Circle(0.1, 0, 0, 1,
+    var ball = new Entity.Circle(0.1, 1, 0, 1,
         pos.add(new Vector2(-1.5/2, -1.5 * Math.sqrt(3)/2)),
         VectorMath2.zero(),
         0,
@@ -37,20 +37,20 @@ function addPendulum(pos) {
 }
 
 function setupScene() {
-    Draw.init("myCanvas", Math.min(window.innerWidth - 250, window.innerHeight - 250), Math.min(window.innerWidth - 250, window.innerHeight - 250) / 2, div);
+    Draw.init("myCanvas", Math.min(window.innerWidth - 250, window.innerHeight - 250), Math.min(window.innerWidth - 250, window.innerHeight - 250), div);
     PhysicsScene.init(undefined, new Vector2(0.0, -9.8), 0.1);
     PhysicsScene.setFloorCollision(0, 0);
 
-    var pos = new Vector2(1, 0.1);
+    var pos = new Vector2(0.5, 0.1);
 
-    addPendulum(pos.add(new Vector2(0, 1.5)));
+    addPendulum(pos.add(new Vector2(0, 1.52)));
 
     var block1 = new Entity.Rectangle(
         0.2,
         0.2,
         1,//fully elastic
         0,
-        1,//1 kg
+        1.2,//1 kg
         pos.add(new Vector2(0.2, 0)),
         new Vector2(0, 0),
         0,
@@ -76,25 +76,24 @@ function setupScene() {
     //     PhysicsScene.addEntity(b);
     // }
 
-    // pos = new Vector2(1.3, 0.1);
-    // var block2 = new Entity.Rectangle(
-    //     0.2,
-    //     0.2,
-    //     0,//fully inelastic
-    //     0,
-    //     1,//1 kg
-    //     pos.add(new Vector2(i * 0.12, 0)),
-    //     new Vector2(0, 0),
-    //     0,
-    //     0,
-    //     "#003f7f"
-    // );
-    // PhysicsScene.addEntity(block2);
+    var block2 = new Entity.Rectangle(
+        0.2,
+        0.2,
+        0,//fully elastic
+        0,
+        1.2,
+        pos.add(new Vector2(0.8,0)),
+        new Vector2(0, 0),
+        0,
+        0,
+        "#5a7614ff"
+    );
+    PhysicsScene.addEntity(block2);
 }
 window.setupScene = setupScene;
 
 function updateFrame() {
-    PhysicsScene.simulate(50);
+    PhysicsScene.simulate(100);
     PhysicsScene.draw();
     //equilibrium = new Vector2(0, 1.5).add(new Vector2(0, 0.196));
 
