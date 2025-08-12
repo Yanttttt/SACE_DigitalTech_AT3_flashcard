@@ -1,4 +1,4 @@
-var path = "./weights.json";
+var path = "./model_4/weights.json";
 var canvas = null;
 var ctx = null;
 var weights = null;
@@ -30,7 +30,7 @@ function setupCanvas() {
     canvas.onmousemove = e => {
         if (!drawing) return;
         ctx.beginPath();
-        ctx.arc(e.offsetX, e.offsetY, 15, 0, Math.PI * 2);
+        ctx.arc(e.offsetX, e.offsetY, 10, 0, Math.PI * 2);
         ctx.fillStyle = 'black';
         ctx.fill();
     };
@@ -70,29 +70,29 @@ function getInput(canvas) {
 
 
 
-    const outCanvas = document.createElement('canvas');
-    outCanvas.width = 28;
-    outCanvas.height = 28;
-    const outCtx = outCanvas.getContext('2d');
+    // const outCanvas = document.createElement('canvas');
+    // outCanvas.width = 28;
+    // outCanvas.height = 28;
+    // const outCtx = outCanvas.getContext('2d');
 
-    const imageData = outCtx.createImageData(28, 28);
-    for (let i = 0; i < input.length; i++) {
-        const color = input[i] * 255; // 0 ~ 255
-        imageData.data[i * 4 + 0] = color; // R
-        imageData.data[i * 4 + 1] = color; // G
-        imageData.data[i * 4 + 2] = color; // B
-        imageData.data[i * 4 + 3] = 255;   // Alpha
-    }
+    // const imageData = outCtx.createImageData(28, 28);
+    // for (let i = 0; i < input.length; i++) {
+    //     const color = input[i] * 255; // 0 ~ 255
+    //     imageData.data[i * 4 + 0] = color; // R
+    //     imageData.data[i * 4 + 1] = color; // G
+    //     imageData.data[i * 4 + 2] = color; // B
+    //     imageData.data[i * 4 + 3] = 255;   // Alpha
+    // }
 
-    outCtx.putImageData(imageData, 0, 0);
+    // outCtx.putImageData(imageData, 0, 0);
 
-    const bigCanvas = document.createElement('canvas');
-    bigCanvas.width = 280;
-    bigCanvas.height = 280;
-    const bigCtx = bigCanvas.getContext('2d');
-    bigCtx.imageSmoothingEnabled = false;
-    bigCtx.drawImage(outCanvas, 0, 0, 280, 280);
-    document.body.appendChild(bigCanvas);
+    // const bigCanvas = document.createElement('canvas');
+    // bigCanvas.width = 280;
+    // bigCanvas.height = 280;
+    // const bigCtx = bigCanvas.getContext('2d');
+    // bigCtx.imageSmoothingEnabled = false;
+    // bigCtx.drawImage(outCanvas, 0, 0, 280, 280);
+    // document.body.appendChild(bigCanvas);
 
     return { shape: [28, 28, 1], values: input };
 }
@@ -196,12 +196,23 @@ function predict() {
     const output = dense(input, weights["dense_Dense1/kernel"], weights["dense_Dense1/bias"]);
 
     let maxIdx = 0;
+    let secIdx = 0;
     for (let i = 1; i < output.values.length; i++) {
-        if (output.values[i] > output.values[maxIdx]) maxIdx = i;
+        if (output.values[i] > output.values[maxIdx]) {
+            secIdx = maxIdx;
+            maxIdx = i;
+        }
+        else if (output.values[i] > output.values[secIdx]) {
+            secIdx = i;
+        }
     }
 
-    document.getElementById('result').innerText =
-        `Predicted digit: ${maxIdx} (prob: ${output.values[maxIdx].toFixed(4)})`;
+    if (output.values[maxIdx] > 0.15) {
+        document.getElementById('result').innerHTML =
+            `Result: ${maxIdx} (prob: ${output.values[maxIdx].toFixed(4)})<br>
+         Also might be: ${secIdx} (prob: ${output.values[secIdx].toFixed(4)})`;
+    }
+
 }
 window.predict = predict;
 
@@ -210,7 +221,20 @@ async function init() {
     console.log(weights);
 }
 
-setupCanvas();
-clear();
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function main() {
+    await init();
+    setupCanvas();
+    clear();
+    document.getElementById("clear").addEventListener("click", clear);
 
-init();
+    while (1) {
+        await sleep(500);
+        predict();
+    }
+}
+
+main();
+
