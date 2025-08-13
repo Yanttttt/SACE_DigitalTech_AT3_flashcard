@@ -2,6 +2,7 @@ var path = "./model_4/weights.json";
 var canvas = null;
 var ctx = null;
 var weights = null;
+var sigfig = 0;
 
 async function loadWeights(path) {
     const res = await fetch(path);
@@ -214,7 +215,6 @@ function predict() {
     }
 
 }
-window.predict = predict;
 
 async function init() {
     weights = await loadWeights(path);
