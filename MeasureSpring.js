@@ -101,9 +101,18 @@ function togglePause() {
 window.togglePause = togglePause;
 
 function answer() {
-    var delta = 1;
-    var ans = prompt("What is the spring constant of the spring in N/m? (nearest integer)");
-    var intans = parseInt(ans);
+    const question = "What is the spring constant of the spring in N/m? (2 significant fiures)";
+    const sigfig = 2;
+
+    window.location.href = "./AnswerDetect/index.html?page="+encodeURIComponent("../MeasureSpring.html") +"&question=" + encodeURIComponent(question) + "&sigfig=" + encodeURIComponent(sigfig);
+}
+window.answer = answer;
+
+function checkAnswer() {
+    const ans = (new URLSearchParams(window.location.search)).get("ans");
+    if (!ans) return;
+    const intans = parseInt(ans);
+    const delta = 1;
     if (intans >= 50 - delta && intans <= 50 + delta) {
         alert("Correct! The spring constant is 50 N/m.");
     }
@@ -111,8 +120,8 @@ function answer() {
         alert("Incorrect. The spring constant is 50 N/m.");
     }
 }
-window.answer = answer;
 
+checkAnswer();
 setupScene();
 hangPendulum();
 updateFrame();
